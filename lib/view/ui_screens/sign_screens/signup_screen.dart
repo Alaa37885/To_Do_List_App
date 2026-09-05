@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:todo_aug_26/view/ui_screens/sign_screens/signin_screen.dart';
 
+import '../../widgets/text_form_field_widget.dart';
+
 class SignupScreen extends StatelessWidget {
   const SignupScreen({super.key});
 
@@ -55,69 +57,19 @@ class SignupScreen extends StatelessWidget {
                 const SizedBox(height: 30),
                 
                 // Name---------------------------------------
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: "Name",
-                    labelStyle: const TextStyle(color: Color(0xffEA3F7E)),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(color: Color(0xffEA3F7E)),
-                    ),
-                  ),
-                ),
+              TextFormFieldWidget(labelText: 'Name',),
                 const SizedBox(height: 15),
 
                 // Email---------------------------------------
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: "Email",
-                    labelStyle: const TextStyle(color: Color(0xffEA3F7E)),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(color: Color(0xffEA3F7E)),
-                    ),
-                  ),
-                ),
+                TextFormFieldWidget(labelText: 'Email',),
                 const SizedBox(height: 15),
 
                 // Password---------------------------------------
-                TextFormField(
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Password",
-                    labelStyle: const TextStyle(color: Color(0xffEA3F7E)),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(color: Color(0xffEA3F7E)),
-                    ),
-                  ),
-                ),
+                TextFormFieldWidget(labelText: 'Password',),
                 const SizedBox(height: 15),
 
                 // Confirm Password---------------------------------------
-                TextFormField(
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Confirm Password",
-                    labelStyle: const TextStyle(color: Color(0xffEA3F7E)),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(color: Color(0xffEA3F7E)),
-                    ),
-                  ),
-                ),
+                TextFormFieldWidget(labelText: 'Confirm Password',),
                 const SizedBox(height: 30),
 
 

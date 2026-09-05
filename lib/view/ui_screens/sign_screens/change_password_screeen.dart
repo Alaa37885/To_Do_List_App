@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../widgets/text_form_field_widget.dart';
+
 class ChangePasswordScreeen extends StatelessWidget {
   const ChangePasswordScreeen({super.key});
 
@@ -54,37 +56,11 @@ class ChangePasswordScreeen extends StatelessWidget {
                 const SizedBox(height: 40),
 
                 // New Pass
-                TextFormField(
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "New Password",
-                    labelStyle: const TextStyle(color: Color(0xffEA3F7E)),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(color: Color(0xffEA3F7E)),
-                    ),
-                  ),
-                ),
+                TextFormFieldWidget(labelText: 'New Password',),
                 const SizedBox(height: 20),
 
                 // Confirm New Pass
-                TextFormField(
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Confirm New Password",
-                    labelStyle: const TextStyle(color: Color(0xffEA3F7E)),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(color: Color(0xffEA3F7E)),
-                    ),
-                  ),
-                ),
+                TextFormFieldWidget(labelText: 'Confirm New Password',),
                 const SizedBox(height: 40),
 
                 // Change Pass Button
