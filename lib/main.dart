@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:todo_aug_26/view/ui_screens/home_screen.dart';
+import 'package:todo_aug_26/view/ui_screens/spalsh_screeen.dart';
 
 void main() {
-  runApp(const MoviesApp());
+  runApp(const ToDoApp());
 }
 
-class MoviesApp extends StatelessWidget {
-  const MoviesApp({super.key});
+class ToDoApp extends StatelessWidget {
+  const ToDoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'TO DO App',
+      title: 'TO DO List App',
 
-      home: const HomeScreen(),
+      home: const SpalshScreeen(),
     );
   }
 }
