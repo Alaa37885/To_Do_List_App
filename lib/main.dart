@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_aug_26/view/ui_screens/spalsh_screeen.dart';
+import 'spalsh_screeen.dart';
 
 void main() {
   runApp(const ToDoApp());

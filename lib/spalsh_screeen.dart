@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_aug_26/view/ui_screens/sign_screens/signin_screen.dart';
+import 'package:todo_aug_26/features/authentication/presentation/ui_screens/sign_screens/signin_screen.dart';
 
 class SpalshScreeen extends StatefulWidget {
   const SpalshScreeen({super.key});
@@ -14,7 +14,7 @@ class _SpalshScreeenState extends State<SpalshScreeen> {
     super.initState();
     goToHome();
   }
-
+  // Future make delay for 2 seconds and go to SingIn Screen
   void goToHome() {
     Future.delayed(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
@@ -28,11 +28,12 @@ class _SpalshScreeenState extends State<SpalshScreeen> {
     });
   }
 
+  // img for SplashScreen
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(child: Image.asset("assets/images/logo.png")),
+      body: Center(child: Image.asset("assets/images/Character.png")),
     );
   }
 }

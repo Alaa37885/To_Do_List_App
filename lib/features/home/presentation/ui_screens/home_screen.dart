@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:todo_aug_26/models/todo_model.dart';
-import 'package:todo_aug_26/view/ui_screens/todo_detail_screen.dart';
+import 'package:todo_aug_26/features/home/presentation/ui_screens/todo_detail_screen.dart';
+
+import '../../data/models/todo_model.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

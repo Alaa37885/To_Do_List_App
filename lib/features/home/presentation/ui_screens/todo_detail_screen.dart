@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:todo_aug_26/models/todo_model.dart';
+
+import '../../data/models/todo_model.dart';
 
 class TodoDetailScreen extends StatelessWidget {
   final TodoModel todo;
@@ -76,6 +77,7 @@ class TodoDetailScreen extends StatelessWidget {
                     ),
                   )),
             ],
+
             const Spacer(),
 
             Center(

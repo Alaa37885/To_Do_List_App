@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:todo_aug_26/view/ui_screens/home_screen.dart';
-import 'package:todo_aug_26/view/ui_screens/sign_screens/signup_screen.dart';
-
+import 'package:todo_aug_26/features/authentication/presentation/ui_screens/sign_screens/signup_screen.dart';
 import '../../widgets/text_form_field_widget.dart';
+import '../../../../home/presentation/ui_screens/home_screen.dart';
 import 'change_password_screeen.dart';
 
 class SingInScreen extends StatelessWidget {
