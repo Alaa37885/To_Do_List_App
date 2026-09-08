@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:todo_aug_26/features/authentication/presentation/ui_screens/sign_screens/signup_screen.dart';
-import '../../widgets/text_form_field_widget.dart';
-import '../../../../home/presentation/ui_screens/home_screen.dart';
+import 'package:todo_aug_26/features/authentication/presentation/ui_screens/signup_screen.dart';
+import '../widgets/text_form_field_widget.dart';
+import '../../../home/presentation/ui_screens/home_screen.dart';
 import 'change_password_screeen.dart';
 
 class SingInScreen extends StatelessWidget {
@@ -27,7 +27,7 @@ class SingInScreen extends StatelessWidget {
           IconButton(
             onPressed: () {},
             icon: const Icon(
-              Icons.navigate_next_rounded,
+              Icons.language_outlined,
               color: Color(0xffEA3F7E),
               size: 34,
             ),
@@ -63,7 +63,7 @@ class SingInScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Forget You Password ? " , style: TextStyle(fontSize: 15),),
+                    const Text("Forget Your Password ? " , style: TextStyle(fontSize: 15),),
 
                     TextButton(
                       onPressed: () {

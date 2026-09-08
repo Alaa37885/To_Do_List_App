@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:todo_aug_26/features/home/presentation/ui_screens/todo_detail_screen.dart';
-
+import '../../../profile/presentation/ui_screens/profile_screen.dart';
 import '../../data/models/todo_model.dart';
+import 'add_todo_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -16,17 +17,20 @@ class HomeScreen extends StatelessWidget {
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.blueGrey, width: 2),
-              borderRadius: BorderRadius.circular(4),
-            ),
             child: Image.asset("assets/images/mobile_tech.png", fit: BoxFit.contain),
           ),
         ),
 
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfileScreen(),
+                ),
+              );
+            },
             icon: const Icon(Icons.person_outline, color: Colors.grey, size: 30),
           ),
         ],
@@ -123,6 +127,8 @@ class HomeScreen extends StatelessWidget {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+
+          // palette button
           FloatingActionButton(
             heroTag: "palette",
             onPressed: () {},
@@ -130,11 +136,20 @@ class HomeScreen extends StatelessWidget {
             child: const Icon(Icons.palette_outlined),
           ),
           const SizedBox(height: 15),
+
+          // add to_do button
           FloatingActionButton(
             heroTag: "add",
-            onPressed: () {},
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => const AddTodoScreen(),
+              );
+            },
             backgroundColor: const Color(0xffEA3F7E),
-            child: const Icon(Icons.add, size: 35),
+            child: const Icon(Icons.add),
           ),
         ],
       ),

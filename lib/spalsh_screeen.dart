@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_aug_26/features/authentication/presentation/ui_screens/sign_screens/signin_screen.dart';
+import 'package:todo_aug_26/features/authentication/presentation/ui_screens/signin_screen.dart';
 
 class SpalshScreeen extends StatefulWidget {
   const SpalshScreeen({super.key});
