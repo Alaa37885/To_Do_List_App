@@ -19,10 +19,14 @@ class AddTodoBottomSheet extends StatefulWidget {
 
 class _AddTodoBottomSheetState extends State<AddTodoBottomSheet> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _deadlineController = TextEditingController();
   final TextEditingController _imageController = TextEditingController();
+
+  File? image;
+  bool isUploadingImage = false;
 
   @override
   void dispose() {
@@ -52,6 +56,7 @@ class _AddTodoBottomSheetState extends State<AddTodoBottomSheet> {
         );
       },
     );
+
     if (picked != null) {
       setState(() {
         _deadlineController.text =
@@ -60,18 +65,83 @@ class _AddTodoBottomSheetState extends State<AddTodoBottomSheet> {
     }
   }
 
-  File? image;
+  Future<void> _pickAndUploadImage() async {
+    final ImagePicker picker = ImagePicker();
+
+    final XFile? res = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
+
+    if (res == null) {
+      return;
+    }
+
+    setState(() {
+      image = File(res.path);
+      isUploadingImage = true;
+    });
+
+    try {
+      final File imageFile = File(res.path);
+
+      final Reference storageRef = FirebaseStorage.instance
+          .ref()
+          .child("image")
+          .child("${DateTime.now().microsecondsSinceEpoch}.jpg");
+
+      final SettableMetadata metadata = SettableMetadata(
+        contentType: 'image/jpeg',
+      );
+
+      final TaskSnapshot snapshot = await storageRef.putFile(
+        imageFile,
+        metadata,
+      );
+
+      final String downloadUrl = await snapshot.ref.getDownloadURL();
+
+      if (mounted) {
+        setState(() {
+          _imageController.text = downloadUrl;
+          isUploadingImage = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          image = null;
+          isUploadingImage = false;
+          _imageController.clear();
+        });
+
+        if (context.mounted) {
+          showDialog(
+            context: context,
+            builder: (context) => const CustomAlertErrorDialog(
+              message: "An error occurred while uploading",
+            ),
+          );
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     const inputBorder = OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(16)),
-      borderSide: BorderSide(color: AppColors.white, width: 1.5),
+      borderSide: BorderSide(
+        color: AppColors.white,
+        width: 1.5,
+      ),
     );
 
     const errorBorder = OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(16)),
-      borderSide: BorderSide(color: Colors.redAccent, width: 1.5),
+      borderSide: BorderSide(
+        color: Colors.redAccent,
+        width: 1.5,
+      ),
     );
 
     return Container(
@@ -164,7 +234,7 @@ class _AddTodoBottomSheetState extends State<AddTodoBottomSheet> {
               ),
               const SizedBox(height: 16),
 
-              // Deadline (Optional) Read-only Field
+              // Deadline Read-only Field
               TextFormField(
                 onTap: () => _selectDate(context),
                 controller: _deadlineController,
@@ -194,87 +264,36 @@ class _AddTodoBottomSheetState extends State<AddTodoBottomSheet> {
 
               const SizedBox(height: 16),
 
-              // Add Image (Optional) Read-only Field / Container
+              // Add Image Read-only Field
               TextFormField(
-                onTap: () async {
-                  final ImagePicker picker = ImagePicker();
-                  final XFile? res = await picker.pickImage(
-                    source: ImageSource.gallery,
-                  );
-
-                  if (res != null) {
-                    setState(() {
-                      image = File(res.path);
-                    });
-                    print("the image selected");
-                    final File imageFile = File(res.path);
-
-                    try {
-                      // 1. Point to the specific file location
-                      final Reference storageRef =
-                          FirebaseStorage.instanceFor(
-                                bucket: "gs://todo-aug-26.firebasestorage.app",
-                              )
-                              .ref()
-                              .child("image")
-                              .child(
-                                "${DateTime.now().microsecondsSinceEpoch}.jpg",
-                              );
-
-                      print("=======> Starting Upload");
-
-                      // 2. Add metadata so iOS sets the MIME type properly
-                      final SettableMetadata metadata = SettableMetadata(
-                        contentType: 'image/jpeg',
-                      );
-
-                      // 3. Upload to the child reference (not the root)
-                      final TaskSnapshot snapshot = await storageRef.putFile(
-                        imageFile,
-                        metadata,
-                      );
-
-                      // 4. Await the download URL
-                      final String downloadUrl = await snapshot.ref
-                          .getDownloadURL();
-                      if (mounted) {
-                        _imageController.text = downloadUrl;
-                      }
-                      print("Download URL: $downloadUrl");
-                    } catch (e) {
-                      if (context.mounted) {
-                        // show dialog if image uploading has error
-                        showDialog(
-                          context: context,
-                          builder: (dialogContext) =>
-                              const CustomAlertErrorDialog(
-                                message: "an error occur while uploading",
-                              ),
-                        );
-
-                        // remove image from ui
-                        setState(() {
-                          image = null;
-                        });
-                      }
-
-                      print("Upload error: $e");
-                    }
-                  }
-                },
+                onTap: isUploadingImage ? null : _pickAndUploadImage,
                 controller: _imageController,
                 readOnly: true,
                 style: const TextStyle(color: AppColors.white, fontSize: 16),
                 decoration: InputDecoration(
-                  hintText: 'add_image_optional'.tr(),
+                  hintText: isUploadingImage
+                      ? 'Uploading image...'
+                      : 'add_image_optional'.tr(),
                   hintStyle: const TextStyle(
                     color: Colors.white70,
                     fontSize: 16,
                   ),
-                  suffixIcon: const Padding(
-                    padding: EdgeInsets.only(right: 16.0),
-                    child: Icon(Icons.image_outlined, color: Colors.white70),
-                  ),
+                  suffixIcon: isUploadingImage
+                      ? const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.white,
+                            ),
+                          ),
+                        )
+                      : const Padding(
+                          padding: EdgeInsets.only(right: 16.0),
+                          child: Icon(Icons.image_outlined, color: Colors.white70),
+                        ),
                   enabledBorder: inputBorder,
                   focusedBorder: inputBorder,
                   contentPadding: const EdgeInsets.symmetric(
@@ -328,45 +347,23 @@ class _AddTodoBottomSheetState extends State<AddTodoBottomSheet> {
                   return SizedBox(
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          context.read<HomeCubit>().createTodo(
-                            Todo(
-                              title: _titleController.text,
-                              description: _descriptionController.text,
-                              deadline: (_deadlineController.text),
-                              image: _imageController.text,
-                            ),
-                          );
-
-                          /// delete document
-                          // fireStore.collection("test").doc("MueKiwedwnodB").delete();
-
-                          /// fetch all docs
-                          // var docs =await fireStore.collection("test").get();
-                          // var listOfDOcs  =docs.docs.map((e) => e.data(),).toList();
-                          // print(listOfDOcs);
-
-                          // adding cloud_firestore package
-                          // taking instance
-                          // create todo
-                          // fetch todo
-
-                          ///  fetch specific doc
-                          // var doc =await fireStore.collection("test").doc("EqfjnueK0NZ0epnijLZC").get();
-                          // print(doc.data());
-
-                          ///  create doc
-                          // var doc =fireStore.collection("test").doc();
-                          // doc.set({
-                          //   "id":doc.id,
-                          //   "todo_title": _titleController.text,
-                          //   "todo_description": _descriptionController.text,
-                          // });
-                        }
-                      },
+                      onPressed: isUploadingImage
+                          ? null
+                          : () async {
+                              if (_formKey.currentState!.validate()) {
+                                context.read<HomeCubit>().createTodo(
+                                      Todo(
+                                        title: _titleController.text,
+                                        description: _descriptionController.text,
+                                        deadline: _deadlineController.text,
+                                        image: _imageController.text,
+                                      ),
+                                    );
+                              }
+                            },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.white,
+                        disabledBackgroundColor: Colors.white54,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
