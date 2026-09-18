@@ -4,20 +4,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_aug_26/core/constants/app_colors.dart';
 import 'package:todo_aug_26/core/constants/app_images.dart';
 import 'package:todo_aug_26/features/auth/presentation/controllers/auth_cubit.dart';
-import 'package:todo_aug_26/features/home/presentation/ui_screens/home_screen.dart';
-
 import '../widgets/FormTextfield.dart';
 import '../widgets/elevationButtonContainer.dart';
+import 'forgetPSW.dart';
 import 'login_screen.dart';
 
-class SingUoScreen extends StatefulWidget {
-  const SingUoScreen({super.key});
+class SingUpScreen extends StatefulWidget {
+  const SingUpScreen({super.key});
 
   @override
-  State<SingUoScreen> createState() => _SingUoScreenState();
+  State<SingUpScreen> createState() => _SingUpScreenState();
 }
 
-class _SingUoScreenState extends State<SingUoScreen> {
+class _SingUpScreenState extends State<SingUpScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _fullnameController = TextEditingController();
@@ -128,8 +127,13 @@ class _SingUoScreenState extends State<SingUoScreen> {
               ),
 
               // Forgot Password
-              InkWell(
-                onTap: () {},
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Forgetpsw()),
+                  );
+                },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -178,7 +182,7 @@ class _SingUoScreenState extends State<SingUoScreen> {
 
               SizedBox(height: 10),
 
-              // Sign up
+              // Sign in when having account
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -193,12 +197,20 @@ class _SingUoScreenState extends State<SingUoScreen> {
 
                   SizedBox(width: 5),
 
-                  Text(
-                    "sign_in".tr(),
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Color(0xffEA3F7E),
-                      fontWeight: FontWeight.w500,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                      );
+                    },
+                    child: Text(
+                      "sign_in".tr(),
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Color(0xffEA3F7E),
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],

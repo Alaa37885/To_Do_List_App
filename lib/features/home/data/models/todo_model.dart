@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:todo_aug_26/features/home/presentation/controllers/home_cubit/home_cubit.dart';
 import 'package:todo_aug_26/features/home/domain/entities/todo_entity.dart';
 
 class TodoModel extends Todo {
   final String id;
+  final String? userId;
   final String todoTitle;
   final String todoDescription;
   final String deadline;
@@ -12,6 +12,7 @@ class TodoModel extends Todo {
 
   TodoModel({
     required this.id,
+    this.userId,
     required this.todoTitle,
     required this.todoDescription,
     required this.deadline,
@@ -22,11 +23,15 @@ class TodoModel extends Todo {
     deadline: deadline,
     description: todoDescription,
     image: img,
+    id: id,
+    userId: userId,
+    createdAt: createdAt,
   );
 
   factory TodoModel.fromJson(Map<String, dynamic> map) =>
       TodoModel(
         id: map['id'] ?? '',
+        userId: map['userId'],
         todoTitle: map['todo_title'] ?? '',
         todoDescription: map['todo_description'] ?? '',
         deadline: map['deadline'] ?? '',

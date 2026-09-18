@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:todo_aug_26/core/constants/app_colors.dart';
 import 'package:todo_aug_26/core/constants/app_images.dart';
 import 'package:todo_aug_26/features/home/presentation/ui_screens/home_screen.dart';
-
-import 'features/auth/presentation/ui_screens/login_screen.dart';
+import 'features/auth/presentation/ui_screens/Singup.dart';
 
 
 class SplashScreen extends StatefulWidget {
@@ -24,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => FirebaseAuth.instance.currentUser!=null ?HomeScreen():const LoginScreen(),
+            builder: (context) => FirebaseAuth.instance.currentUser!=null ?HomeScreen():const SingUpScreen(),
           ),
         );
       }

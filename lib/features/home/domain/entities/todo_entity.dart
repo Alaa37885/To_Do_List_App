@@ -1,6 +1,7 @@
 class Todo {
   final DateTime? createdAt;
   final String? id;
+  final String? userId;
   final String title;
   final String description;
   final String? deadline;
@@ -12,6 +13,7 @@ class Todo {
     required this.deadline,
     required this.image,
     this.id,
+    this.userId,
     this.createdAt,
   });
 }

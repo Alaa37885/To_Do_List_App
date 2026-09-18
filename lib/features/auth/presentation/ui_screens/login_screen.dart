@@ -6,10 +6,10 @@ import 'package:todo_aug_26/core/constants/app_images.dart';
 import 'package:todo_aug_26/core/widgets/custom_alert_error_dialog.dart';
 import 'package:todo_aug_26/features/auth/presentation/controllers/auth_cubit.dart';
 import 'package:todo_aug_26/features/home/presentation/ui_screens/home_screen.dart';
-
 import '../widgets/FormTextfield.dart';
 import '../widgets/elevationButtonContainer.dart';
 import 'Singup.dart';
+import 'forgetPSW.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -144,17 +144,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 15),
 
                 // Forgot Password
-                InkWell(
+                GestureDetector(
                   onTap: () {
-                    // هنضيف navigation بعدين
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Forgetpsw()),
+                    );
                   },
-
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
-
                     children: [
                       Text(
-                        "forget_password".tr(context: context),
+                        "forget_password".tr(),
                         style: TextStyle(
                           color: Color(0xff9CA3AF),
                           fontSize: 16,
@@ -230,7 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const SingUoScreen(),
+                            builder: (context) => const SingUpScreen(),
                           ),
                         );
                       },
