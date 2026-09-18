@@ -32,6 +32,7 @@ class _EditTodoBottomSheetState extends State<EditTodoBottomSheet> {
   late TextEditingController _imageController;
 
   File? image;
+  bool isUploadingImage = false;
 
   @override
   void initState() {
@@ -78,6 +79,52 @@ class _EditTodoBottomSheetState extends State<EditTodoBottomSheet> {
     }
   }
 
+  Future<void> _pickAndUploadImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? res = await picker.pickImage(source: ImageSource.gallery);
+
+    if (res == null) return;
+
+    setState(() {
+      image = File(res.path);
+      isUploadingImage = true;
+    });
+
+    try {
+      final File imageFile = File(res.path);
+      final Reference storageRef = FirebaseStorage.instance
+          .ref()
+          .child("image")
+          .child("${DateTime.now().microsecondsSinceEpoch}.jpg");
+
+      final SettableMetadata metadata = SettableMetadata(contentType: 'image/jpeg');
+      final TaskSnapshot snapshot = await storageRef.putFile(imageFile, metadata);
+      final String downloadUrl = await snapshot.ref.getDownloadURL();
+
+      if (mounted) {
+        setState(() {
+          _imageController.text = downloadUrl;
+          isUploadingImage = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          image = null;
+          isUploadingImage = false;
+        });
+        if (context.mounted) {
+          showDialog(
+            context: context,
+            builder: (context) => const CustomAlertErrorDialog(
+              message: "An error occurred while uploading",
+            ),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const inputBorder = OutlineInputBorder(
@@ -111,7 +158,6 @@ class _EditTodoBottomSheetState extends State<EditTodoBottomSheet> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Top Grab Handle
               Center(
                 child: Container(
                   width: 60,
@@ -124,7 +170,6 @@ class _EditTodoBottomSheetState extends State<EditTodoBottomSheet> {
               ),
               const SizedBox(height: 20),
 
-              // Title TextFormField
               TextFormField(
                 controller: _titleController,
                 style: const TextStyle(color: AppColors.white, fontSize: 16),
@@ -137,23 +182,16 @@ class _EditTodoBottomSheetState extends State<EditTodoBottomSheet> {
                 },
                 decoration: InputDecoration(
                   hintText: 'todo_title'.tr(),
-                  hintStyle: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
-                  ),
+                  hintStyle: const TextStyle(color: Colors.white70, fontSize: 16),
                   enabledBorder: inputBorder,
                   focusedBorder: inputBorder,
                   errorBorder: errorBorder,
                   focusedErrorBorder: errorBorder,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 ),
               ),
               const SizedBox(height: 16),
 
-              // Description TextFormField
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 13,
@@ -167,10 +205,7 @@ class _EditTodoBottomSheetState extends State<EditTodoBottomSheet> {
                 },
                 decoration: InputDecoration(
                   hintText: 'todo_description'.tr(),
-                  hintStyle: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
-                  ),
+                  hintStyle: const TextStyle(color: Colors.white70, fontSize: 16),
                   enabledBorder: inputBorder,
                   focusedBorder: inputBorder,
                   errorBorder: errorBorder,
@@ -180,7 +215,6 @@ class _EditTodoBottomSheetState extends State<EditTodoBottomSheet> {
               ),
               const SizedBox(height: 16),
 
-              // Deadline Read-only Field
               TextFormField(
                 onTap: () => _selectDate(context),
                 controller: _deadlineController,
@@ -188,99 +222,43 @@ class _EditTodoBottomSheetState extends State<EditTodoBottomSheet> {
                 style: const TextStyle(color: AppColors.white, fontSize: 16),
                 decoration: InputDecoration(
                   hintText: 'deadline_optional'.tr(),
-                  hintStyle: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
-                  ),
+                  hintStyle: const TextStyle(color: Colors.white70),
                   suffixIcon: const Padding(
                     padding: EdgeInsets.only(right: 16.0),
-                    child: Icon(
-                      Icons.calendar_today_outlined,
-                      color: Colors.white70,
-                    ),
+                    child: Icon(Icons.calendar_today_outlined, color: Colors.white70),
                   ),
                   enabledBorder: inputBorder,
                   focusedBorder: inputBorder,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 ),
               ),
 
               const SizedBox(height: 16),
 
-              // Add Image Read-only Field
               TextFormField(
-                onTap: () async {
-                  final ImagePicker picker = ImagePicker();
-                  final XFile? res = await picker.pickImage(
-                    source: ImageSource.gallery,
-                  );
-
-                  if (res != null) {
-                    setState(() {
-                      image = File(res.path);
-                    });
-                    final File imageFile = File(res.path);
-
-                    try {
-                      final Reference storageRef = FirebaseStorage.instanceFor(
-                            bucket: "gs://todo-aug-26.firebasestorage.app",
-                          )
-                          .ref()
-                          .child("image")
-                          .child(
-                            "${DateTime.now().microsecondsSinceEpoch}.jpg",
-                          );
-
-                      final SettableMetadata metadata = SettableMetadata(
-                        contentType: 'image/jpeg',
-                      );
-
-                      final TaskSnapshot snapshot = await storageRef.putFile(
-                        imageFile,
-                        metadata,
-                      );
-
-                      final String downloadUrl = await snapshot.ref.getDownloadURL();
-                      if (mounted) {
-                        _imageController.text = downloadUrl;
-                      }
-                    } catch (e) {
-                      if (context.mounted) {
-                        showDialog(
-                          context: context,
-                          builder: (dialogContext) => const CustomAlertErrorDialog(
-                            message: "an error occur while uploading",
-                          ),
-                        );
-                        setState(() {
-                          image = null;
-                        });
-                      }
-                    }
-                  }
-                },
+                onTap: isUploadingImage ? null : _pickAndUploadImage,
                 controller: _imageController,
                 readOnly: true,
                 style: const TextStyle(color: AppColors.white, fontSize: 16),
                 decoration: InputDecoration(
-                  hintText: 'add_image_optional'.tr(),
-                  hintStyle: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
-                  ),
-                  suffixIcon: const Padding(
-                    padding: EdgeInsets.only(right: 16.0),
-                    child: Icon(Icons.image_outlined, color: Colors.white70),
-                  ),
+                  hintText: isUploadingImage ? 'Uploading image...' : 'add_image_optional'.tr(),
+                  hintStyle: const TextStyle(color: Colors.white70),
+                  suffixIcon: isUploadingImage
+                      ? const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
+                          ),
+                        )
+                      : const Padding(
+                          padding: EdgeInsets.only(right: 16.0),
+                          child: Icon(Icons.image_outlined, color: Colors.white70),
+                        ),
                   enabledBorder: inputBorder,
                   focusedBorder: inputBorder,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 ),
               ),
 
@@ -291,12 +269,7 @@ class _EditTodoBottomSheetState extends State<EditTodoBottomSheet> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(21),
-                      child: Image.file(
-                        image!,
-                        height: 90,
-                        width: 90,
-                        fit: BoxFit.cover,
-                      ),
+                      child: Image.file(image!, height: 90, width: 90, fit: BoxFit.cover),
                     ),
                   ],
                 )
@@ -318,54 +291,45 @@ class _EditTodoBottomSheetState extends State<EditTodoBottomSheet> {
                 ),
               const SizedBox(height: 24),
 
-              // SAVE CHANGES Button (نفس الـ style لـ add todo)
               BlocConsumer<HomeCubit, HomeState>(
                 listener: (context, state) {},
                 builder: (context, state) {
                   if (state is HomeUpdateTodoLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primary,
-                      ),
-                    );
+                    return const Center(child: CircularProgressIndicator(color: AppColors.primary));
                   }
                   return SizedBox(
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          final updatedTodo = Todo(
-                            id: widget.todo.id,
-                            title: _titleController.text,
-                            description: _descriptionController.text,
-                            deadline: _deadlineController.text,
-                            image: _imageController.text,
-                            createdAt: widget.todo.createdAt,
-                          );
-                          
-                          context.read<HomeCubit>().updateTodo(updatedTodo);
-                          widget.onUpdated(
-                            _titleController.text,
-                            _descriptionController.text,
-                            _deadlineController.text,
-                            _imageController.text,
-                          );
-                        }
-                      },
+                      onPressed: isUploadingImage
+                          ? null
+                          : () async {
+                              if (_formKey.currentState!.validate()) {
+                                final updatedTodo = Todo(
+                                  id: widget.todo.id,
+                                  title: _titleController.text.trim(),
+                                  description: _descriptionController.text.trim(),
+                                  deadline: _deadlineController.text,
+                                  image: _imageController.text,
+                                  createdAt: widget.todo.createdAt,
+                                );
+                                context.read<HomeCubit>().updateTodo(updatedTodo);
+                                widget.onUpdated(
+                                  _titleController.text,
+                                  _descriptionController.text,
+                                  _deadlineController.text,
+                                  _imageController.text,
+                                );
+                              }
+                            },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.white,
+                        disabledBackgroundColor: Colors.white54,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
                       child: Text(
                         'ok'.tr(),
-                        style: const TextStyle(
-                          color: AppColors.secondary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                        style: const TextStyle(color: AppColors.secondary, fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                     ),
                   );
