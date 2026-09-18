@@ -1,44 +1,37 @@
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:todo_aug_26/features/home/presentation/controllers/home_cubit/home_cubit.dart';
+import 'package:todo_aug_26/features/home/domain/entities/todo_entity.dart';
 
-class TodoModel {
-  final String title;
-  final String description;
-  final String createdAt;
-  final Color color;
-  final List<String> checklist;
+class TodoModel extends Todo {
+  final String id;
+  final String todoTitle;
+  final String todoDescription;
+  final String deadline;
+  final String img;
+  final DateTime? createdAt;
 
   TodoModel({
-    required this.title,
-    required this.description,
+    required this.id,
+    required this.todoTitle,
+    required this.todoDescription,
+    required this.deadline,
+    required this.img,
     required this.createdAt,
-    required this.color,
-    this.checklist = const [],
-  });
+  }) : super(
+    title: todoTitle,
+    deadline: deadline,
+    description: todoDescription,
+    image: img,
+  );
+
+  factory TodoModel.fromJson(Map<String, dynamic> map) =>
+      TodoModel(
+        id: map['id'] ?? '',
+        todoTitle: map['todo_title'] ?? '',
+        todoDescription: map['todo_description'] ?? '',
+        deadline: map['deadline'] ?? '',
+        img: map['img'] ?? '',
+        createdAt: map['createdAt'] != null ? (map['createdAt'] as Timestamp)
+            .toDate():null,
+      );
 }
-
-final List<TodoModel> dummyTodos = [
-  TodoModel(
-    title: "Design UI App",
-    description: "Make To-DO UI Design for NTI.",
-    createdAt: "1 Sept 2021",
-    color: const Color(0xffEA3F7E),
-    checklist: [
-      "login",
-      "register",
-      "home",
-      "detail",
-      "add",
-      "edit",
-      "delete",
-      "profile",
-    ],
-  ),
-
-  TodoModel(
-    title: "Make UI Design",
-    description: "Make Ui design for the mini project post figma link to the trello using ...",
-    createdAt: "1 Sept 2021",
-    color: const Color(0xffF99CB3),
-    checklist: [],
-  ),
-];

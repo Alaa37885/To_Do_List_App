@@ -1,155 +1,178 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:todo_aug_26/features/home/presentation/ui_screens/todo_detail_screen.dart';
-import '../../../profile/presentation/ui_screens/profile_screen.dart';
-import '../../data/models/todo_model.dart';
-import 'add_todo_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:todo_aug_26/core/constants/app_colors.dart';
+import 'package:todo_aug_26/core/constants/app_images.dart';
+import 'package:todo_aug_26/features/home/presentation/controllers/home_cubit/home_cubit.dart';
+import 'package:todo_aug_26/features/home/presentation/ui_screens/todo_details_screen.dart';
+import 'package:todo_aug_26/features/home/presentation/widgets/add_todo_bottom_sheet.dart';
+import 'package:todo_aug_26/features/profile/presentation/ui_screens/profile_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    context.read<HomeCubit>().fetchTodos();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            child: Image.asset("assets/images/mobile_tech.png", fit: BoxFit.contain),
-          ),
-        ),
-
+        leading: SvgPicture.asset(AppImages.mobileTech),
         actions: [
-          IconButton(
-            onPressed: () {
+          GestureDetector(
+            onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfileScreen(),
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
+            child: SvgPicture.asset(AppImages.profile),
+          ),
+          SizedBox(width: 21),
+        ],
+      ),
+      body: Stack(
+        children: [
+          BlocBuilder<HomeCubit, HomeState>(
+            builder: (context, state) {
+              if (state is HomeFetchTodosLoading) {
+                return Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                );
+              }
+              if (state is HomeCreateTodoFailure) {
+                return Text(
+                  state.message,
+                  style: TextStyle(color: AppColors.red),
+                );
+              }
+
+              if (state is HomeFetchTodosSuccess) {
+                var todos = state.todos;
+                return ListView.separated(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                  itemBuilder: (context, index) => GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (screenContext) => BlocProvider.value(
+                            value: context.read<HomeCubit>(),
+                            child: TodoDetailsScreen(
+                              todo: todos[index],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * 0.20,
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: AppColors.primary,
+                      ),
+
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            todos[index].title,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 18,
+                              color: AppColors.white,
+                            ),
+                          ),
+
+                          Flexible(
+                            child: Text(
+                              todos[index].description,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                                color: AppColors.white,
+                              ),
+                              maxLines: 4,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+
+                          Text(
+                            todos[index].createdAt == null
+                                ? ""
+                                : DateFormat(
+                                    "yyyy-MMM-dd",
+                                  ).format(todos[index].createdAt!),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                              color: AppColors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  separatorBuilder: (context, index) => SizedBox(height: 10),
+                  itemCount: todos.length,
+                );
+              }
+
+              return Center(
+                child: Text(
+                  "unexpected error happened",
+                  style: TextStyle(color: AppColors.red),
                 ),
               );
             },
-            icon: const Icon(Icons.person_outline, color: Colors.grey, size: 30),
-          ),
-        ],
-      ),
-
-
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Text(
-              "Home",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue,
-              ),
-            ),
           ),
 
-
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: dummyTodos.length,
-              itemBuilder: (context, index) {
-                final todo = dummyTodos[index];
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TodoDetailScreen(todo: todo),
-                      ),
-                    );
-                  },
-
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 20),
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: todo.color,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              todo.title,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const Icon(Icons.access_time, color: Colors.white, size: 20),
-                          ],
-                        ),
-
-                        const SizedBox(height: 10),
-                        Text(
-                          todo.description,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.white70,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-
-                        const SizedBox(height: 20),
-                        Text(
-                          "Created at ${todo.createdAt}",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.white60,
-                          ),
-                        ),
-                      ],
-                    ),
+          Positioned(
+            bottom: MediaQuery.of(context).size.height * 0.060,
+            right: 20,
+            child: GestureDetector(
+              onTap: () {
+                showModalBottomSheet(
+                  isScrollControlled: true,
+                  backgroundColor: AppColors.transparent,
+                  context: context,
+                  builder: (sheetContext) => BlocProvider.value(
+                    value: context.read<HomeCubit>(),
+                    child: const AddTodoBottomSheet(),
                   ),
                 );
               },
+              child: Container(
+                height: 54,
+                width: 54,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.white,
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x33000000),
+                      blurRadius: 10,
+                      spreadRadius: 1,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Icon(Icons.add, color: AppColors.primary, size: 32),
+              ),
             ),
-          ),
-        ],
-      ),
-
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-
-          // palette button
-          FloatingActionButton(
-            heroTag: "palette",
-            onPressed: () {},
-            backgroundColor: const Color(0xffEA3F7E),
-            child: const Icon(Icons.palette_outlined),
-          ),
-          const SizedBox(height: 15),
-
-          // add to_do button
-          FloatingActionButton(
-            heroTag: "add",
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (context) => const AddTodoScreen(),
-              );
-            },
-            backgroundColor: const Color(0xffEA3F7E),
-            child: const Icon(Icons.add),
           ),
         ],
       ),
