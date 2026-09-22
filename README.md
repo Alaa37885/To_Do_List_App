@@ -55,7 +55,7 @@ lib/
 
 1.  **Clone the repository**:
     ```bash
-    git clone [your-repo-link]
+    git clone [(https://github.com/Alaa37885/To_Do_List_App.git)]
     ```
 2.  **Install dependencies**:
     ```bash
@@ -74,6 +74,4 @@ lib/
 
 Contributions are welcome! If you have suggestions for new features or improvements, feel free to open an issue or submit a pull request.
 
-## 📝 License
-
-This project is licensed under the MIT License.
+## Author : A'laa Omar Hamed
