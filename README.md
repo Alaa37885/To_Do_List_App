@@ -70,8 +70,4 @@ lib/
     flutter run
     ```
 
-## 🤝 Contribution
-
-Contributions are welcome! If you have suggestions for new features or improvements, feel free to open an issue or submit a pull request.
-
 ## Author : A'laa Omar Hamed
